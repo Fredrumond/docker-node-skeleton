@@ -30,6 +30,7 @@ services: ## Define um serviço
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
     links:
       - db
     ports:
