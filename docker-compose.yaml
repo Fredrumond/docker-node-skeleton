@@ -5,8 +5,40 @@ services: ## Define um serviço
     build: 
       context: node ## localização do dockerfile
     container_name: app
+    networks: ## rede em que vai rodar o container
+      - node-network
     command: npm start ## comando a executar
+    tty: true
     ports:
       - "3000:3000" ## redirecionamento de porta quando chegar alguma requisição na porta 3000 chama o container na porta 3000
     volumes:
       - ./node:/usr/src/app ## monitoro a pasta atual . e envio as alterações para /usr/app
+
+  db:
+    image: mysql:5.7
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes: 
+      - ./mysql:/var/lib/mysql
+    environment: 
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks: 
+      - node-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    links:
+      - db
+    ports:
+      - 80:80
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - node-network
+
+networks: 
+  node-network:
+    driver: bridge 
